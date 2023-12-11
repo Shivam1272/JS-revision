@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XML API Request</title>
+    <style>
+        body {
+            background-color: #212121;
+            color: aliceblue;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        div {
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input {
+            margin-bottom: 10px;
+            padding: 8px;
+        }
+
+        .card {
+            background-color: #333;
+            width: 500px;
+            height: 150px;
+            color: white;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        img {
+            width: 100%;
+            height: auto;
+            border-radius: 50%;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 16px;
+        }
+
+        a {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        a:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <span>0    UNSENT               Client has been created. open() not called yet.</span><br>
+        <span>1    OPENED               open() has been called.</span><br>
+        <span>2    HEADERS_RECEIVED    send() has been called, and headers and status are available.</span><br>
+        <span>3    LOADING    Downloading; responseText holds partial data.</span><br>
+        <span>4    DONE               The operation is complete.</span><br>
+    </div>
+    <div>
+        <form id="myForm">
+            <label for="githubUserName">GitHub UserName:</label><br>
+            <input type="text" name="githubUserName" id="githubUserName" placeholder="Enter your GitHub UserName"><br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('myForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const githubUserName = document.querySelector('#githubUserName').value.toLowerCase();
+            const requestUrl = `https://api.github.com/users/${githubUserName}`;
+            const xhr = new XMLHttpRequest();
+
+            xhr.open('GET', requestUrl);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        const responseData = JSON.parse(xhr.responseText);
+                        console.log(responseData);
+
+                        const body = document.querySelector('body');
+                        const mainDiv = document.createElement('div');
+                        mainDiv.className = 'card';
+
+                        const imgDiv = document.createElement('div');
+                        const img = document.createElement('img');
+                        img.src = responseData.avatar_url;
+                        img.alt = 'Profile Photo';
+                        imgDiv.appendChild(img);
+                        imgDiv.style.flexBasis = '30%'; // Set width to 30%
+
+                        const textDiv = document.createElement('div');
+                        const h1 = document.createElement('h1');
+                        h1.innerText = `UserName: ${responseData.login}`;
+                        const p = document.createElement('p');
+                        p.innerText = `Public repo count: ${responseData.public_repos}`;
+                        const a = document.createElement('a');
+                        a.href = responseData.html_url;
+                        a.target = '_blank'; // Open in a new tab
+                        a.innerText = 'Visit GitHub Profile';
+                        
+                        
+                        textDiv.appendChild(h1);
+                        textDiv.appendChild(p);
+                        textDiv.appendChild(a);
+                        textDiv.style.flexBasis = '70%'; // Set width to 70%
+                        
+                        
+                        mainDiv.appendChild(imgDiv);
+                        mainDiv.appendChild(textDiv);
+
+                        body.appendChild(mainDiv);
+                    } else {
+                        console.error('Error fetching user data. Status:', xhr.status);
+                    }
+                }
+            };
+
+            xhr.send();
+        });
+    </script>
+</body>
+</html>
